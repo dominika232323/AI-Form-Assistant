@@ -17,19 +17,16 @@ def display_form(form_data=None):
         firstname = st.text_input("Firstname",
                                   value=form_data.get("firstname", ""),
                                   max_chars=20,
-                                  key="firstname",
-                                  disabled=True)
+                                  key="firstname")
 
         lastname = st.text_input("Lastname",
                                   value=form_data.get("lastname", ""),
                                   max_chars=20,
-                                  key="lastname",
-                                  disabled=True)
+                                  key="lastname")
 
         email = st.text_input("Email",
                               value=form_data.get("email", ""),
-                              key="email",
-                              disabled=True)
+                              key="email")
 
         if email and not check_email(email):
             st.warning("Please enter a valid email address")
@@ -37,15 +34,13 @@ def display_form(form_data=None):
         reason_of_contact = st.text_area("Reason of contact",
                                          value=form_data.get("reason", ""),
                                          max_chars=100,
-                                         key="reason",
-                                         disabled=True)
+                                         key="reason")
 
         urgency = st.slider("Urgency",
                             min_value=1,
                             max_value=10,
                             value=form_data.get("urgency", 5),
-                            key="urgency",
-                            disabled=True)
+                            key="urgency")
 
         submitted = st.form_submit_button("Save form")
 
