@@ -18,4 +18,4 @@ def get_response(prompt: str, api_key: str=None, model: str="gemini-2.0-flash"):
         model=model, contents=prompt
     )
 
-    return response.text
+    return response
