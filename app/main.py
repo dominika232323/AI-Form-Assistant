@@ -4,6 +4,7 @@ import streamlit as st
 
 
 def main():
+    st.set_page_config(layout="wide")
     col1, col2 = st.columns([1, 2])
 
     with col1:
