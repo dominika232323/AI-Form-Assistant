@@ -1,6 +1,5 @@
 from form import display_form
 from chat import display_chat
-from assistant import get_response, get_gemini_api_key
 import streamlit as st
 
 
