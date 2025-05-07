@@ -8,11 +8,14 @@ def get_gemini_api_key():
     return os.getenv("GEMINI_API_KEY")
 
 
-def get_response(prompt, api_key, model="gemini-2.0-flash"):
+def get_response(prompt: str, api_key: str=None, model: str="gemini-2.0-flash"):
+    if api_key is None:
+        api_key = get_gemini_api_key()
+
     client = genai.Client(api_key=api_key)
 
     response = client.models.generate_content(
         model=model, contents=prompt
     )
 
-    return response.text
+    return response
