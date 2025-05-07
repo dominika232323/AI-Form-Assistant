@@ -96,14 +96,82 @@ def update_form(updated_data):
             "Urgency": "urgency"
         }
 
+        errors = []
+
         for gemini_key, state_key in field_mapping.items():
             value = updated_data.get(gemini_key, "")
-            if value:
+
+            if gemini_key == "Firstname":
+                error = validate_firstname(value)
+            elif gemini_key == "Lastname":
+                error = validate_lastname(value)
+            elif gemini_key == "Email":
+                error = validate_email_value(value)
+            elif gemini_key == "Reason of contact":
+                error = validate_reason_of_contact(value)
+            elif gemini_key == "Urgency":
+                error = validate_urgency(value)
+            else:
+                error = None
+
+            if error:
+                errors.append(error)
+            else:
                 st.session_state[state_key] = value
 
-        st.success("Form updated based on Gemini's response!")
-        st.rerun()
+        if errors:
+            for error in errors:
+                st.error(error)
+        else:
+            st.success("Form updated based on Gemini's response!")
+            st.rerun()
 
     except (json.JSONDecodeError, ValueError):
         st.warning(
-            "Could not parse Gemini's response as JSON. Please make sure the assistant replies with valid JSON.")
+            "Could not parse Gemini's response as JSON. Please make sure the assistant replies with valid JSON."
+        )
+
+
+def validate_firstname(value):
+    if not isinstance(value, str):
+        return "Firstname must be a string."
+    elif len(value) > 20:
+        return "Firstname must be at most 20 characters."
+    return None
+
+
+def validate_lastname(value):
+    if not isinstance(value, str):
+        return "Lastname must be a string."
+    elif len(value) > 20:
+        return "Lastname must be at most 20 characters."
+    return None
+
+
+def validate_email_value(value):
+    if not isinstance(value, str):
+        return "Email must be a string."
+    elif not check_email(value):
+        return "Invalid email format."
+    return None
+
+
+def validate_reason_of_contact(value):
+    if not isinstance(value, str):
+        return "Reason of contact must be a string."
+    elif len(value) > 100:
+        return "Reason of contact must be at most 100 characters."
+    return None
+
+
+def validate_urgency(value):
+    if value != "":
+        try:
+            urgency_int = int(value)
+            if 1 <= urgency_int <= 10:
+                return None
+            else:
+                return "Urgency must be an integer between 1 and 10."
+        except ValueError:
+            return "Urgency must be an integer between 1 and 10."
+    return None
