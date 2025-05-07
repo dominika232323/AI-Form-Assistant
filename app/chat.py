@@ -1,3 +1,4 @@
+import re
 import streamlit as st
 from assistant import get_response
 import json
@@ -35,34 +36,38 @@ def handle_user_prompt(prompt: str):
 
         st.session_state.messages.append({"role": "assistant", "content": response.text})
 
-        clean_json_text = extract_json_from_response(response.text)
-        update_form(clean_json_text)
+        update_form(response)
 
 
-def extract_json_from_response(text):
-    if "```" in text:
-        parts = text.split("```")
-
-        for part in parts:
-            if part.strip().startswith("{"):
-                return part.strip()
-
-            if part.strip().startswith("json"):
-                return "\n".join(part.strip().split("\n")[1:]).strip()
-
-    return text.strip()
-
-
-def update_form(clean_json_text):
+def update_form(response):
     try:
-        response_data = json.loads(clean_json_text)
+        updated_data = extract_json(response.text)
 
-        for field, value in response_data.items():
-            if field.lower() in ["firstname", "lastname", "email", "reason of contact", "urgency"]:
-                key = field.lower().replace(" ", "")
+        field_mapping = {
+            "Firstname": "firstname",
+            "Lastname": "lastname",
+            "Email": "email",
+            "Reason of contact": "reason",
+            "Urgency": "urgency"
+        }
 
-                if key in st.session_state:
-                    st.session_state[key] = value
+        for gemini_key, state_key in field_mapping.items():
+            value = updated_data.get(gemini_key, "")
+            if value:
+                st.session_state[state_key] = value
 
-    except json.JSONDecodeError as e:
-        st.warning(f"Gemini's response wasn't valid JSON; no form fields were updated.\n\nError: {str(e)}")
+        st.success("Form updated based on Gemini's response!")
+        st.rerun()
+
+    except (json.JSONDecodeError, ValueError):
+        st.warning(
+            "Could not parse Gemini's response as JSON. Please make sure the assistant replies with valid JSON.")
+
+
+def extract_json(text):
+    # Find the first {...} block
+    match = re.search(r'\{.*?\}', text, re.DOTALL)
+    if match:
+        return json.loads(match.group())
+    else:
+        raise ValueError("No JSON found in text.")
