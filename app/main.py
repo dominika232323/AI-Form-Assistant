@@ -1,12 +1,26 @@
-import os
-from google import genai
-from dotenv import load_dotenv
+from form import display_form
+from assistant import get_response, get_gemini_api_key
+from file_utils import read_json
+import streamlit as st
 
 
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+def main():
+    col1, col2 = st.columns([1, 2])
 
-response = client.models.generate_content(
-    model="gemini-2.0-flash", contents="Explain how AI works in a few words"
-)
-print(response.text)
+    with col1:
+        st.header("Helpdesk Form")
+
+        display_form()
+
+    with col2:
+        st.header("AI Assistant Chat")
+
+        api_key = get_gemini_api_key()
+        prompt = "Explain how AI works in a few words"
+        response = get_response(prompt, api_key)
+
+        st.write(response)
+
+
+if __name__ == "__main__":
+    main()
