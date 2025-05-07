@@ -1,7 +1,6 @@
 import json
 import streamlit as st
 from email_validator import validate_email, EmailNotValidError
-
 from file_utils import read_json
 
 
@@ -65,6 +64,14 @@ def load_form_data() -> tuple[dict, bool]:
                 st.session_state.last_uploaded_filename = uploaded_file.name
                 st.success("File loaded successfully!")
 
+                # Validate the loaded form data
+                validation_errors = validate_loaded_data(form_data)
+                if validation_errors:
+                    for error in validation_errors:
+                        st.error(error)
+                else:
+                    st.success("Form data is valid!")
+
                 return form_data, True  # <-- True means new file loaded
 
             return st.session_state.loaded_form_data, False
@@ -76,12 +83,26 @@ def load_form_data() -> tuple[dict, bool]:
     return st.session_state.get("loaded_form_data", {}), False
 
 
+def validate_loaded_data(form_data: dict):
+    remove_wrong_data_from_loaded_data(form_data, "firstname", validate_firstname)
+    remove_wrong_data_from_loaded_data(form_data, "lastname", validate_lastname)
+    remove_wrong_data_from_loaded_data(form_data, "email", validate_email_value)
+    remove_wrong_data_from_loaded_data(form_data, "reason", validate_reason_of_contact)
+    remove_wrong_data_from_loaded_data(form_data, "urgency", validate_urgency)
+
+
+def remove_wrong_data_from_loaded_data(form_data: dict, field: str, validation_func):
+    error = validation_func(form_data.get(field, ""))
+
+    if error:
+        form_data[field] = ""
+        st.error(error)
+
 
 def check_email(email: str) -> bool:
     try:
         validate_email(email)
         return True
-
     except EmailNotValidError:
         return False
 
