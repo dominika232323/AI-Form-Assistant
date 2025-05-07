@@ -4,62 +4,45 @@ from email_validator import validate_email, EmailNotValidError
 from file_utils import read_json
 
 
-def display_form(form_data=None):
-    if form_data is None:
-        form_data = {}
+def display_form():
+    form_data, newly_loaded = load_form_data()
 
-    form_data = load_form_data()
+    for key in ["firstname", "lastname", "email", "reason", "urgency"]:
+        if key not in st.session_state:
+            st.session_state[key] = form_data.get(key, "")
 
-    if 'form_saved' not in st.session_state:
-        st.session_state.form_saved = False
+    if newly_loaded:
+        st.session_state.firstname = form_data.get("firstname", "")
+        st.session_state.lastname = form_data.get("lastname", "")
+        st.session_state.email = form_data.get("email", "")
+        st.session_state.reason = form_data.get("reason", "")
+        st.session_state.urgency = form_data.get("urgency", "")
 
-    with st.form("contact_form"):
-        firstname = st.text_input("Firstname",
-                                  value=form_data.get("firstname", ""),
-                                  max_chars=20,
-                                  key="firstname")
+    st.subheader("Current Form Data")
 
-        lastname = st.text_input("Lastname",
-                                  value=form_data.get("lastname", ""),
-                                  max_chars=20,
-                                  key="lastname")
+    form_display = {
+        "Firstname": st.session_state.firstname,
+        "Lastname": st.session_state.lastname,
+        "Email": st.session_state.email,
+        "Reason of contact": st.session_state.reason,
+        "Urgency": st.session_state.urgency
+    }
 
-        email = st.text_input("Email",
-                              value=form_data.get("email", ""),
-                              key="email")
+    st.json(form_display)
 
-        if email and not check_email(email):
-            st.warning("Please enter a valid email address")
-
-        reason_of_contact = st.text_area("Reason of contact",
-                                         value=form_data.get("reason", ""),
-                                         max_chars=100,
-                                         key="reason")
-
-        urgency = st.slider("Urgency",
-                            min_value=1,
-                            max_value=10,
-                            value=form_data.get("urgency", 5),
-                            key="urgency")
-
-        submitted = st.form_submit_button("Save form")
-
-        if submitted:
-            st.session_state.saved_data = {
-                "firstname": firstname,
-                "lastname": lastname,
-                "email": email,
-                "reason": reason_of_contact,
-                "urgency": urgency
-            }
-            st.session_state.form_saved = True
-            st.success("Form saved successfully!")
+    st.session_state.saved_data = {
+        "firstname": st.session_state.firstname,
+        "lastname": st.session_state.lastname,
+        "email": st.session_state.email,
+        "reason": st.session_state.reason,
+        "urgency": st.session_state.urgency
+    }
 
     download_form()
 
 
 def download_form():
-    if st.session_state.get('form_saved'):
+    if "saved_data" in st.session_state:
         json_data = json.dumps(st.session_state.saved_data, indent=4)
 
         st.download_button(
@@ -70,23 +53,33 @@ def download_form():
         )
 
 
-def load_form_data() -> dict:
+def load_form_data() -> tuple[dict, bool]:
     uploaded_file = st.file_uploader("Load your form from a JSON file", type=['json'])
 
     if uploaded_file is not None:
         try:
-            st.success("File loaded successfully!")
-            return read_json(uploaded_file)
+            if "last_uploaded_filename" not in st.session_state or uploaded_file.name != st.session_state.last_uploaded_filename:
+                form_data = read_json(uploaded_file)
+                st.session_state.loaded_form_data = form_data
+                st.session_state.last_uploaded_filename = uploaded_file.name
+                st.success("File loaded successfully!")
+
+                return form_data, True  # <-- True means new file loaded
+
+            return st.session_state.loaded_form_data, False
+
         except Exception as e:
             st.error(f"Error loading file: {str(e)}")
-            return {}
+            return {}, False
 
-    return {}
+    return st.session_state.get("loaded_form_data", {}), False
+
 
 
 def check_email(email: str) -> bool:
     try:
         validate_email(email)
         return True
+
     except EmailNotValidError:
         return False
