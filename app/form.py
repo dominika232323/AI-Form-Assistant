@@ -7,7 +7,7 @@ from file_utils import read_json
 def display_form():
     form_data, newly_loaded = load_form_data()
 
-    for key in ["firstname", "lastname", "email", "reason", "urgency"]:
+    for key in ["firstname", "lastname", "email", "reason_of_contact", "urgency"]:
         if key not in st.session_state:
             st.session_state[key] = form_data.get(key, "")
 
@@ -15,7 +15,7 @@ def display_form():
         st.session_state.firstname = form_data.get("firstname", "")
         st.session_state.lastname = form_data.get("lastname", "")
         st.session_state.email = form_data.get("email", "")
-        st.session_state.reason = form_data.get("reason", "")
+        st.session_state.reason_of_contact = form_data.get("reason_of_contact", "")
         st.session_state.urgency = form_data.get("urgency", "")
 
     st.subheader("Current Form Data")
@@ -24,7 +24,7 @@ def display_form():
         "Firstname": st.session_state.firstname,
         "Lastname": st.session_state.lastname,
         "Email": st.session_state.email,
-        "Reason of contact": st.session_state.reason,
+        "Reason of contact": st.session_state.reason_of_contact,
         "Urgency": st.session_state.urgency
     }
 
@@ -34,7 +34,7 @@ def display_form():
         "firstname": st.session_state.firstname,
         "lastname": st.session_state.lastname,
         "email": st.session_state.email,
-        "reason": st.session_state.reason,
+        "reason_of_contact": st.session_state.reason_of_contact,
         "urgency": st.session_state.urgency
     }
 
@@ -64,15 +64,9 @@ def load_form_data() -> tuple[dict, bool]:
                 st.session_state.last_uploaded_filename = uploaded_file.name
                 st.success("File loaded successfully!")
 
-                # Validate the loaded form data
-                validation_errors = validate_loaded_data(form_data)
-                if validation_errors:
-                    for error in validation_errors:
-                        st.error(error)
-                else:
-                    st.success("Form data is valid!")
+                validate_loaded_data(form_data)
 
-                return form_data, True  # <-- True means new file loaded
+                return form_data, True
 
             return st.session_state.loaded_form_data, False
 
@@ -87,7 +81,7 @@ def validate_loaded_data(form_data: dict):
     remove_wrong_data_from_loaded_data(form_data, "firstname", validate_firstname)
     remove_wrong_data_from_loaded_data(form_data, "lastname", validate_lastname)
     remove_wrong_data_from_loaded_data(form_data, "email", validate_email_value)
-    remove_wrong_data_from_loaded_data(form_data, "reason", validate_reason_of_contact)
+    remove_wrong_data_from_loaded_data(form_data, "reason_of_contact", validate_reason_of_contact)
     remove_wrong_data_from_loaded_data(form_data, "urgency", validate_urgency)
 
 
@@ -113,7 +107,7 @@ def update_form(updated_data):
             "Firstname": "firstname",
             "Lastname": "lastname",
             "Email": "email",
-            "Reason of contact": "reason",
+            "Reason of contact": "reason_of_contact",
             "Urgency": "urgency"
         }
 
