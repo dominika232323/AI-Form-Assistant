@@ -1,4 +1,5 @@
 from form import display_form
+from chat import display_chat
 from assistant import get_response, get_gemini_api_key
 import streamlit as st
 
@@ -13,12 +14,7 @@ def main():
 
     with col2:
         st.header("AI Assistant Chat")
-
-        api_key = get_gemini_api_key()
-        prompt = "Explain how AI works in a few words"
-        response = get_response(prompt, api_key)
-
-        st.write(response)
+        display_chat()
 
 
 if __name__ == "__main__":
