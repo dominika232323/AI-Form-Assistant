@@ -25,5 +25,5 @@ docker build -t ai-form-assistant .
 ### Run the container
 
 ```bash
-docker run --env-file .env -it ai-form-assistant
+docker run --env-file .env -p 8501:8501 ai-form-assistant
 ```
