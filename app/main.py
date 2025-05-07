@@ -3,10 +3,23 @@ from google import genai
 from dotenv import load_dotenv
 
 
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+def get_gemini_api_key():
+    load_dotenv()
+    return os.getenv("GEMINI_API_KEY")
 
-response = client.models.generate_content(
-    model="gemini-2.0-flash", contents="Explain how AI works in a few words"
-)
-print(response.text)
+
+def get_response(prompt, api_key, model="gemini-2.0-flash"):
+    client = genai.Client(api_key=api_key)
+
+    response = client.models.generate_content(
+        model=model, contents=prompt
+    )
+
+    return response.text
+
+
+if __name__ == "__main__":
+    api_key = get_gemini_api_key()
+    prompt = "Explain how AI works in a few words"
+    response = get_response(prompt, api_key)
+    print(response)
