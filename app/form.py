@@ -138,7 +138,8 @@ def update_form(updated_data):
             if error:
                 errors.append(error)
             else:
-                st.session_state[state_key] = value
+                if value != "":
+                    st.session_state[state_key] = value
 
         if errors:
             for error in errors:
@@ -172,7 +173,7 @@ def validate_lastname(value):
 def validate_email_value(value):
     if not isinstance(value, str):
         return "Email must be a string."
-    elif not check_email(value):
+    elif value and not check_email(value):
         return "Invalid email format."
     return None
 
