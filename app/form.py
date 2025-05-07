@@ -1,4 +1,5 @@
 import streamlit as st
+from email_validator import validate_email, EmailNotValidError
 
 
 def display_form(form_data: dict):
@@ -15,10 +16,13 @@ def display_form(form_data: dict):
                       key="lastname",
                       disabled=True)
 
-        st.text_input("Email",
-                      value=form_data.get("email", ""),
-                      key="email",
-                      disabled=True)
+        email = st.text_input("Email",
+                              value=form_data.get("email", ""),
+                              key="email",
+                              disabled=True)
+
+        if not check_email(email):
+            st.warning("Please enter a valid email address")
 
         st.text_area("Reason of contact",
                      value=form_data.get("reason", ""),
@@ -32,3 +36,11 @@ def display_form(form_data: dict):
                   value=form_data.get("urgency", 5),
                   key="urgency",
                   disabled=True)
+
+
+def check_email(email: str) -> bool:
+    try:
+        validate_email(email)
+        return True
+    except EmailNotValidError:
+        return False

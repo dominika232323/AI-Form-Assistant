@@ -12,7 +12,7 @@ def main():
         form_data = {
             "firstname": "John",
             "lastname": "Doe",
-            "email": "john.doe@example.com",
+            "email": "john.doe@gmail.com",
             "reason": "I need help with a technical issue",
             "urgency": 5
         }
