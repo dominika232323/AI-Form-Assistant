@@ -1,5 +1,7 @@
 import re
 import streamlit as st
+
+from form import update_form
 from assistant import get_response
 import json
 
@@ -15,6 +17,7 @@ def display_chat():
 def initialize_chat_history():
     if "messages" not in st.session_state:
         st.session_state.messages = []
+
 
 def display_chat_history():
     for message in st.session_state.messages:
@@ -36,36 +39,11 @@ def handle_user_prompt(prompt: str):
 
         st.session_state.messages.append({"role": "assistant", "content": response.text})
 
-        update_form(response)
-
-
-def update_form(response):
-    try:
         updated_data = extract_json(response.text)
-
-        field_mapping = {
-            "Firstname": "firstname",
-            "Lastname": "lastname",
-            "Email": "email",
-            "Reason of contact": "reason",
-            "Urgency": "urgency"
-        }
-
-        for gemini_key, state_key in field_mapping.items():
-            value = updated_data.get(gemini_key, "")
-            if value:
-                st.session_state[state_key] = value
-
-        st.success("Form updated based on Gemini's response!")
-        st.rerun()
-
-    except (json.JSONDecodeError, ValueError):
-        st.warning(
-            "Could not parse Gemini's response as JSON. Please make sure the assistant replies with valid JSON.")
+        update_form(updated_data)
 
 
 def extract_json(text):
-    # Find the first {...} block
     match = re.search(r'\{.*?\}', text, re.DOTALL)
     if match:
         return json.loads(match.group())

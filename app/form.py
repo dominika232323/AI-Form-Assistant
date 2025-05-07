@@ -1,6 +1,7 @@
 import json
 import streamlit as st
 from email_validator import validate_email, EmailNotValidError
+
 from file_utils import read_json
 
 
@@ -83,3 +84,26 @@ def check_email(email: str) -> bool:
 
     except EmailNotValidError:
         return False
+
+
+def update_form(updated_data):
+    try:
+        field_mapping = {
+            "Firstname": "firstname",
+            "Lastname": "lastname",
+            "Email": "email",
+            "Reason of contact": "reason",
+            "Urgency": "urgency"
+        }
+
+        for gemini_key, state_key in field_mapping.items():
+            value = updated_data.get(gemini_key, "")
+            if value:
+                st.session_state[state_key] = value
+
+        st.success("Form updated based on Gemini's response!")
+        st.rerun()
+
+    except (json.JSONDecodeError, ValueError):
+        st.warning(
+            "Could not parse Gemini's response as JSON. Please make sure the assistant replies with valid JSON.")
