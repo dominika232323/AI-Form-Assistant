@@ -1,5 +1,6 @@
 from form import display_form
 from assistant import get_response, get_gemini_api_key
+from file_utils import read_json
 import streamlit as st
 
 
@@ -9,14 +10,7 @@ def main():
     with col1:
         st.header("Helpdesk Form")
 
-        form_data = {
-            "firstname": "John",
-            "lastname": "Doe",
-            "email": "john.doe@gmail.com",
-            "reason": "I need help with a technical issue",
-            "urgency": 5
-        }
-        display_form(form_data)
+        display_form()
 
     with col2:
         st.header("AI Assistant Chat")
