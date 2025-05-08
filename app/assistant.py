@@ -1,19 +1,11 @@
-import os
 from google import genai
 from google.genai import types
-from dotenv import load_dotenv
+
+from config import GEMINI_API_KEY, GEMINI_MODEL
 
 
-def get_gemini_api_key():
-    load_dotenv()
-    return os.getenv("GEMINI_API_KEY")
-
-
-def get_response(prompt: str, api_key: str=None, model: str="gemini-2.0-flash"):
-    if api_key is None:
-        api_key = get_gemini_api_key()
-
-    client = genai.Client(api_key=api_key)
+def get_response(prompt: str):
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
     system_prompt = (
         "You are an assistant helping the user fill out a contact form. "
@@ -25,7 +17,7 @@ def get_response(prompt: str, api_key: str=None, model: str="gemini-2.0-flash"):
     )
 
     response = client.models.generate_content(
-        model=model,
+        model=GEMINI_MODEL,
         config=types.GenerateContentConfig(system_instruction=system_prompt),
         contents=prompt
     )
