@@ -36,6 +36,7 @@ Create an .env file in the root directory:
 ```
 GEMINI_API_KEY=your_google_gemini_api_key_here
 ```
+You can get your API key from: https://aistudio.google.com/apikey
 
 ## Running the Application
 
