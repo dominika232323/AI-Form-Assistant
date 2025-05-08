@@ -24,7 +24,7 @@ This application uses Google's Gemini LLM to assist users in filling out a helpd
 ### Clone the repository
 
 ```bash
-git clone https://github.com/your-username/ai-helpdesk-assistant.git
+git clone https://github.com/dominika232323/AI-Form-Assistant.git
 cd ai-helpdesk-assistant
 ```
 
