@@ -1,5 +1,7 @@
 # AI-Form-Assistant
 
+An application that uses generative AI to assist users in filling out a helpdesk form.
+
 ## Getting started
 
 ### Clone the repository
