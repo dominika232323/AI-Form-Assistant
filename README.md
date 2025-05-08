@@ -11,7 +11,9 @@ This application uses Google's Gemini LLM to assist users in filling out a helpd
    * Reason for contact (max 100 characters)
    * Urgency (integer between 1-10)
 3. Real-time form state display 
-4. Docker containerization for easy deployment
+4. Loading form contents from a file
+5. Downloading the form
+6. Docker containerization for easy deployment
 
 ## Prerequisites
 
