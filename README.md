@@ -2,6 +2,17 @@
 
 This application uses Google's Gemini LLM to assist users in filling out a helpdesk form through a chat-based interface. The assistant guides users to provide the required information, validates inputs, and stores the form data in JSON format.
 
+## Features
+
+1. Interactive chat interface for form filling
+2. Validation for form fields:
+   * Firstname and Lastname (max 20 characters)
+   * Email (format validation)
+   * Reason for contact (max 100 characters)
+   * Urgency (integer between 1-10)
+3. Real-time form state display 
+4. Docker containerization for easy deployment
+
 ## Prerequisites
 
 * Python 3.13
