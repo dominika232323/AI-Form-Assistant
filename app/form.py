@@ -4,67 +4,45 @@ from email_validator import validate_email, EmailNotValidError
 from file_utils import read_json
 
 
-def display_form(form_data=None):
-    if form_data is None:
-        form_data = {}
+def display_form():
+    form_data, newly_loaded = load_form_data()
 
-    form_data = load_form_data()
+    for key in ["firstname", "lastname", "email", "reason_of_contact", "urgency"]:
+        if key not in st.session_state:
+            st.session_state[key] = form_data.get(key, "")
 
-    if 'form_saved' not in st.session_state:
-        st.session_state.form_saved = False
+    if newly_loaded:
+        st.session_state.firstname = form_data.get("firstname", "")
+        st.session_state.lastname = form_data.get("lastname", "")
+        st.session_state.email = form_data.get("email", "")
+        st.session_state.reason_of_contact = form_data.get("reason_of_contact", "")
+        st.session_state.urgency = form_data.get("urgency", "")
 
-    with st.form("contact_form"):
-        firstname = st.text_input("Firstname",
-                                  value=form_data.get("firstname", ""),
-                                  max_chars=20,
-                                  key="firstname",
-                                  disabled=True)
+    st.subheader("Current Form Data")
 
-        lastname = st.text_input("Lastname",
-                                  value=form_data.get("lastname", ""),
-                                  max_chars=20,
-                                  key="lastname",
-                                  disabled=True)
+    form_display = {
+        "Firstname": st.session_state.firstname,
+        "Lastname": st.session_state.lastname,
+        "Email": st.session_state.email,
+        "Reason of contact": st.session_state.reason_of_contact,
+        "Urgency": st.session_state.urgency
+    }
 
-        email = st.text_input("Email",
-                              value=form_data.get("email", ""),
-                              key="email",
-                              disabled=True)
+    st.json(form_display)
 
-        if email and not check_email(email):
-            st.warning("Please enter a valid email address")
-
-        reason_of_contact = st.text_area("Reason of contact",
-                                         value=form_data.get("reason", ""),
-                                         max_chars=100,
-                                         key="reason",
-                                         disabled=True)
-
-        urgency = st.slider("Urgency",
-                            min_value=1,
-                            max_value=10,
-                            value=form_data.get("urgency", 5),
-                            key="urgency",
-                            disabled=True)
-
-        submitted = st.form_submit_button("Save form")
-
-        if submitted:
-            st.session_state.saved_data = {
-                "firstname": firstname,
-                "lastname": lastname,
-                "email": email,
-                "reason": reason_of_contact,
-                "urgency": urgency
-            }
-            st.session_state.form_saved = True
-            st.success("Form saved successfully!")
+    st.session_state.saved_data = {
+        "firstname": st.session_state.firstname,
+        "lastname": st.session_state.lastname,
+        "email": st.session_state.email,
+        "reason_of_contact": st.session_state.reason_of_contact,
+        "urgency": st.session_state.urgency
+    }
 
     download_form()
 
 
 def download_form():
-    if st.session_state.get('form_saved'):
+    if "saved_data" in st.session_state:
         json_data = json.dumps(st.session_state.saved_data, indent=4)
 
         st.download_button(
@@ -75,18 +53,44 @@ def download_form():
         )
 
 
-def load_form_data() -> dict:
+def load_form_data() -> tuple[dict, bool]:
     uploaded_file = st.file_uploader("Load your form from a JSON file", type=['json'])
 
     if uploaded_file is not None:
         try:
-            st.success("File loaded successfully!")
-            return read_json(uploaded_file)
+            if "last_uploaded_filename" not in st.session_state or uploaded_file.name != st.session_state.last_uploaded_filename:
+                form_data = read_json(uploaded_file)
+                st.session_state.loaded_form_data = form_data
+                st.session_state.last_uploaded_filename = uploaded_file.name
+                st.success("File loaded successfully!")
+
+                validate_loaded_data(form_data)
+
+                return form_data, True
+
+            return st.session_state.loaded_form_data, False
+
         except Exception as e:
             st.error(f"Error loading file: {str(e)}")
-            return {}
+            return {}, False
 
-    return {}
+    return st.session_state.get("loaded_form_data", {}), False
+
+
+def validate_loaded_data(form_data: dict):
+    remove_wrong_data_from_loaded_data(form_data, "firstname", validate_firstname)
+    remove_wrong_data_from_loaded_data(form_data, "lastname", validate_lastname)
+    remove_wrong_data_from_loaded_data(form_data, "email", validate_email_value)
+    remove_wrong_data_from_loaded_data(form_data, "reason_of_contact", validate_reason_of_contact)
+    remove_wrong_data_from_loaded_data(form_data, "urgency", validate_urgency)
+
+
+def remove_wrong_data_from_loaded_data(form_data: dict, field: str, validation_func):
+    error = validation_func(form_data.get(field, ""))
+
+    if error:
+        form_data[field] = ""
+        st.error(error)
 
 
 def check_email(email: str) -> bool:
@@ -95,3 +99,95 @@ def check_email(email: str) -> bool:
         return True
     except EmailNotValidError:
         return False
+
+
+def update_form(updated_data):
+    try:
+        field_mapping = {
+            "Firstname": "firstname",
+            "Lastname": "lastname",
+            "Email": "email",
+            "Reason of contact": "reason_of_contact",
+            "Urgency": "urgency"
+        }
+
+        errors = []
+
+        for gemini_key, state_key in field_mapping.items():
+            value = updated_data.get(gemini_key, "")
+
+            if gemini_key == "Firstname":
+                error = validate_firstname(value)
+            elif gemini_key == "Lastname":
+                error = validate_lastname(value)
+            elif gemini_key == "Email":
+                error = validate_email_value(value)
+            elif gemini_key == "Reason of contact":
+                error = validate_reason_of_contact(value)
+            elif gemini_key == "Urgency":
+                error = validate_urgency(value)
+            else:
+                error = None
+
+            if error:
+                errors.append(error)
+            else:
+                if value != "":
+                    st.session_state[state_key] = value
+
+        if errors:
+            for error in errors:
+                st.error(error)
+        else:
+            st.success("Form updated based on Gemini's response!")
+            st.rerun()
+
+    except (json.JSONDecodeError, ValueError):
+        st.warning(
+            "Could not parse Gemini's response as JSON. Please make sure the assistant replies with valid JSON."
+        )
+
+
+def validate_firstname(value):
+    if not isinstance(value, str):
+        return "Firstname must be a string."
+    elif len(value) > 20:
+        return "Firstname must be at most 20 characters."
+    return None
+
+
+def validate_lastname(value):
+    if not isinstance(value, str):
+        return "Lastname must be a string."
+    elif len(value) > 20:
+        return "Lastname must be at most 20 characters."
+    return None
+
+
+def validate_email_value(value):
+    if not isinstance(value, str):
+        return "Email must be a string."
+    elif value and not check_email(value):
+        return "Invalid email format."
+    return None
+
+
+def validate_reason_of_contact(value):
+    if not isinstance(value, str):
+        return "Reason of contact must be a string."
+    elif len(value) > 100:
+        return "Reason of contact must be at most 100 characters."
+    return None
+
+
+def validate_urgency(value):
+    if value != "":
+        try:
+            urgency_int = int(value)
+            if 1 <= urgency_int <= 10:
+                return None
+            else:
+                return "Urgency must be an integer between 1 and 10."
+        except ValueError:
+            return "Urgency must be an integer between 1 and 10."
+    return None

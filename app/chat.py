@@ -1,5 +1,9 @@
+import re
 import streamlit as st
+
+from form import update_form
 from assistant import get_response
+import json
 
 
 def display_chat():
@@ -13,6 +17,7 @@ def display_chat():
 def initialize_chat_history():
     if "messages" not in st.session_state:
         st.session_state.messages = []
+
 
 def display_chat_history():
     for message in st.session_state.messages:
@@ -33,3 +38,14 @@ def handle_user_prompt(prompt: str):
             st.markdown(response.text)
 
         st.session_state.messages.append({"role": "assistant", "content": response.text})
+
+        updated_data = extract_json(response.text)
+        update_form(updated_data)
+
+
+def extract_json(text):
+    match = re.search(r'\{.*?\}', text, re.DOTALL)
+    if match:
+        return json.loads(match.group())
+    else:
+        raise ValueError("No JSON found in text.")

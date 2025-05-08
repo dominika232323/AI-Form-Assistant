@@ -1,7 +1,6 @@
 import json
 
 
-
 def read_json(file_path):
     if hasattr(file_path, 'read'):
         return json.load(file_path)
