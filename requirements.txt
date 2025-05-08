@@ -2,3 +2,5 @@ python-dotenv
 google-genai
 streamlit
 email-validator
+mypy
+black

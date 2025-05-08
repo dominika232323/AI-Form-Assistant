@@ -36,6 +36,7 @@ Create an .env file in the root directory:
 ```
 GEMINI_API_KEY=your_google_gemini_api_key_here
 ```
+You can get your API key from: https://aistudio.google.com/apikey
 
 ## Running the Application
 
@@ -61,3 +62,9 @@ Open http://localhost:8501/ in your browser.
 2. At any point, you can:
    * Load a form from a JSON file from your desktop.
    * Download the current form.
+
+## Code Quality & Refactoring
+
+To ensure the code is clean, well-formatted, and type-safe, the following tools are used:
+* black for automatically formating Python code according to PEP8 standards,
+* mypy for catching type errors and ensuring your type hints are correct.

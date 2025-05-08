@@ -1,10 +1,12 @@
 import json
+from typing import Any
+
 import streamlit as st
 from email_validator import validate_email, EmailNotValidError
 from file_utils import read_json
 
 
-def display_form():
+def display_form() -> None:
     form_data, newly_loaded = load_form_data()
 
     for key in ["firstname", "lastname", "email", "reason_of_contact", "urgency"]:
@@ -25,7 +27,7 @@ def display_form():
         "Lastname": st.session_state.lastname,
         "Email": st.session_state.email,
         "Reason of contact": st.session_state.reason_of_contact,
-        "Urgency": st.session_state.urgency
+        "Urgency": st.session_state.urgency,
     }
 
     st.json(form_display)
@@ -35,13 +37,13 @@ def display_form():
         "lastname": st.session_state.lastname,
         "email": st.session_state.email,
         "reason_of_contact": st.session_state.reason_of_contact,
-        "urgency": st.session_state.urgency
+        "urgency": st.session_state.urgency,
     }
 
     download_form()
 
 
-def download_form():
+def download_form() -> None:
     if "saved_data" in st.session_state:
         json_data = json.dumps(st.session_state.saved_data, indent=4)
 
@@ -49,16 +51,19 @@ def download_form():
             label="Download form data as JSON",
             data=json_data,
             file_name="contact_form.json",
-            mime="application/json"
+            mime="application/json",
         )
 
 
 def load_form_data() -> tuple[dict, bool]:
-    uploaded_file = st.file_uploader("Load your form from a JSON file", type=['json'])
+    uploaded_file = st.file_uploader("Load your form from a JSON file", type=["json"])
 
     if uploaded_file is not None:
         try:
-            if "last_uploaded_filename" not in st.session_state or uploaded_file.name != st.session_state.last_uploaded_filename:
+            if (
+                "last_uploaded_filename" not in st.session_state
+                or uploaded_file.name != st.session_state.last_uploaded_filename
+            ):
                 form_data = read_json(uploaded_file)
                 st.session_state.loaded_form_data = form_data
                 st.session_state.last_uploaded_filename = uploaded_file.name
@@ -77,15 +82,19 @@ def load_form_data() -> tuple[dict, bool]:
     return st.session_state.get("loaded_form_data", {}), False
 
 
-def validate_loaded_data(form_data: dict):
+def validate_loaded_data(form_data: dict) -> None:
     remove_wrong_data_from_loaded_data(form_data, "firstname", validate_firstname)
     remove_wrong_data_from_loaded_data(form_data, "lastname", validate_lastname)
     remove_wrong_data_from_loaded_data(form_data, "email", validate_email_value)
-    remove_wrong_data_from_loaded_data(form_data, "reason_of_contact", validate_reason_of_contact)
+    remove_wrong_data_from_loaded_data(
+        form_data, "reason_of_contact", validate_reason_of_contact
+    )
     remove_wrong_data_from_loaded_data(form_data, "urgency", validate_urgency)
 
 
-def remove_wrong_data_from_loaded_data(form_data: dict, field: str, validation_func):
+def remove_wrong_data_from_loaded_data(
+    form_data: dict, field: str, validation_func
+) -> None:
     error = validation_func(form_data.get(field, ""))
 
     if error:
@@ -101,14 +110,14 @@ def check_email(email: str) -> bool:
         return False
 
 
-def update_form(updated_data):
+def update_form(updated_data: dict) -> None:
     try:
         field_mapping = {
             "Firstname": "firstname",
             "Lastname": "lastname",
             "Email": "email",
             "Reason of contact": "reason_of_contact",
-            "Urgency": "urgency"
+            "Urgency": "urgency",
         }
 
         errors = []
@@ -148,7 +157,7 @@ def update_form(updated_data):
         )
 
 
-def validate_firstname(value):
+def validate_firstname(value: Any) -> str | None:
     if not isinstance(value, str):
         return "Firstname must be a string."
     elif len(value) > 20:
@@ -156,7 +165,7 @@ def validate_firstname(value):
     return None
 
 
-def validate_lastname(value):
+def validate_lastname(value: Any) -> str | None:
     if not isinstance(value, str):
         return "Lastname must be a string."
     elif len(value) > 20:
@@ -164,7 +173,7 @@ def validate_lastname(value):
     return None
 
 
-def validate_email_value(value):
+def validate_email_value(value: Any) -> str | None:
     if not isinstance(value, str):
         return "Email must be a string."
     elif value and not check_email(value):
@@ -172,7 +181,7 @@ def validate_email_value(value):
     return None
 
 
-def validate_reason_of_contact(value):
+def validate_reason_of_contact(value: Any) -> str | None:
     if not isinstance(value, str):
         return "Reason of contact must be a string."
     elif len(value) > 100:
@@ -180,7 +189,7 @@ def validate_reason_of_contact(value):
     return None
 
 
-def validate_urgency(value):
+def validate_urgency(value: Any) -> str | None:
     if value != "":
         try:
             urgency_int = int(value)
