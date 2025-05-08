@@ -19,7 +19,7 @@ def get_response(prompt: str) -> types.GenerateContentResponse:
     response = client.models.generate_content(
         model=GEMINI_MODEL,
         config=types.GenerateContentConfig(system_instruction=system_prompt),
-        contents=prompt
+        contents=prompt,
     )
 
     return response

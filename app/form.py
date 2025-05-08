@@ -27,7 +27,7 @@ def display_form() -> None:
         "Lastname": st.session_state.lastname,
         "Email": st.session_state.email,
         "Reason of contact": st.session_state.reason_of_contact,
-        "Urgency": st.session_state.urgency
+        "Urgency": st.session_state.urgency,
     }
 
     st.json(form_display)
@@ -37,7 +37,7 @@ def display_form() -> None:
         "lastname": st.session_state.lastname,
         "email": st.session_state.email,
         "reason_of_contact": st.session_state.reason_of_contact,
-        "urgency": st.session_state.urgency
+        "urgency": st.session_state.urgency,
     }
 
     download_form()
@@ -51,16 +51,19 @@ def download_form() -> None:
             label="Download form data as JSON",
             data=json_data,
             file_name="contact_form.json",
-            mime="application/json"
+            mime="application/json",
         )
 
 
 def load_form_data() -> tuple[dict, bool]:
-    uploaded_file = st.file_uploader("Load your form from a JSON file", type=['json'])
+    uploaded_file = st.file_uploader("Load your form from a JSON file", type=["json"])
 
     if uploaded_file is not None:
         try:
-            if "last_uploaded_filename" not in st.session_state or uploaded_file.name != st.session_state.last_uploaded_filename:
+            if (
+                "last_uploaded_filename" not in st.session_state
+                or uploaded_file.name != st.session_state.last_uploaded_filename
+            ):
                 form_data = read_json(uploaded_file)
                 st.session_state.loaded_form_data = form_data
                 st.session_state.last_uploaded_filename = uploaded_file.name
@@ -83,11 +86,15 @@ def validate_loaded_data(form_data: dict) -> None:
     remove_wrong_data_from_loaded_data(form_data, "firstname", validate_firstname)
     remove_wrong_data_from_loaded_data(form_data, "lastname", validate_lastname)
     remove_wrong_data_from_loaded_data(form_data, "email", validate_email_value)
-    remove_wrong_data_from_loaded_data(form_data, "reason_of_contact", validate_reason_of_contact)
+    remove_wrong_data_from_loaded_data(
+        form_data, "reason_of_contact", validate_reason_of_contact
+    )
     remove_wrong_data_from_loaded_data(form_data, "urgency", validate_urgency)
 
 
-def remove_wrong_data_from_loaded_data(form_data: dict, field: str, validation_func) -> None:
+def remove_wrong_data_from_loaded_data(
+    form_data: dict, field: str, validation_func
+) -> None:
     error = validation_func(form_data.get(field, ""))
 
     if error:
@@ -110,7 +117,7 @@ def update_form(updated_data: dict) -> None:
             "Lastname": "lastname",
             "Email": "email",
             "Reason of contact": "reason_of_contact",
-            "Urgency": "urgency"
+            "Urgency": "urgency",
         }
 
         errors = []

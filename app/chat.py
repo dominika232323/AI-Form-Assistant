@@ -37,7 +37,9 @@ def handle_user_prompt(prompt: str) -> None:
         with st.chat_message("assistant"):
             st.markdown(response.text)
 
-        st.session_state.messages.append({"role": "assistant", "content": response.text})
+        st.session_state.messages.append(
+            {"role": "assistant", "content": response.text}
+        )
 
         updated_data = extract_json(response.text)
         update_form(updated_data)
@@ -47,7 +49,7 @@ def extract_json(text: str | None) -> dict:
     if not text:
         text = ""
 
-    match = re.search(r'\{.*?\}', text, re.DOTALL)
+    match = re.search(r"\{.*?\}", text, re.DOTALL)
 
     if match:
         return json.loads(match.group())
