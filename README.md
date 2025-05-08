@@ -8,7 +8,7 @@ This application uses Google's Gemini LLM to assist users in filling out a helpd
 * Docker
 * Google Gemini API key
 
-## How to Run
+## Setup Instructions
 
 ### Clone the repository
 
@@ -24,7 +24,9 @@ Create an .env file in the root directory:
 GEMINI_API_KEY=your_google_gemini_api_key_here
 ```
 
-### Build Docker container
+## Running the Application
+
+### Build the Docker image
 
 ```bash
 docker build -t ai-form-assistant .
@@ -35,3 +37,14 @@ docker build -t ai-form-assistant .
 ```bash
 docker run --env-file .env -p 8501:8501 ai-form-assistant
 ```
+
+### Access the application
+
+Open http://localhost:8501/ in your browser.
+
+## Usage Instructions
+
+1. Start a conversation with the AI assistant 
+2. At any point, you can:
+   * Load a form from a JSON file from your desktop.
+   * Download the current form.
