@@ -4,7 +4,7 @@ from google.genai import types
 from config import GEMINI_API_KEY, GEMINI_MODEL
 
 
-def get_response(prompt: str):
+def get_response(prompt: str) -> types.GenerateContentResponse:
     client = genai.Client(api_key=GEMINI_API_KEY)
 
     system_prompt = (
