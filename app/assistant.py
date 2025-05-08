@@ -12,7 +12,7 @@ def get_response(prompt: str) -> types.GenerateContentResponse:
         "The form has the following fields: Firstname, Lastname, Email, Reason of contact, and Urgency (1-10). "
         "Ask questions one at a time and gather these details. "
         "Reply ONLY with JSON containing the fields you've filled in, like: "
-        '{"Firstname": "John", "Lastname": "", "Email": "", "Reason of contact": "", "Urgency": ""}. '
+        '{"Firstname": "", "Lastname": "", "Email": "", "Reason of contact": "", "Urgency": ""}. '
         "If you don't have an answer for a field yet, leave it empty."
     )
 
