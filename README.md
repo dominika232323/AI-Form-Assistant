@@ -1,8 +1,14 @@
 # AI-Form-Assistant
 
-An application that uses generative AI to assist users in filling out a helpdesk form.
+This application uses Google's Gemini LLM to assist users in filling out a helpdesk form through a chat-based interface. The assistant guides users to provide the required information, validates inputs, and stores the form data in JSON format.
 
-## Getting started
+## Prerequisites
+
+* Python 3.13
+* Docker
+* Google Gemini API key
+
+## How to Run
 
 ### Clone the repository
 
